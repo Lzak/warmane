@@ -1,54 +1,46 @@
 import requests
 import time
 
-g1 = requests.get("http://armory.warmane.com/api/guild/Ice+Crown+Citadel/Lordaeron/summary").json()
-time.sleep(5)
-g2 = requests.get("http://armory.warmane.com/api/guild/Icecrown+Citadel+Raiders/Lordaeron/summary").json()
+# ------------------------------- Config ---------------------------------------
+guild_links =   ['http://armory.warmane.com/api/guild/Ice+Crown+Citadel/Lordaeron/summary',
+                'http://armory.warmane.com/api/guild/Icecrown+Citadel+Raiders/Lordaeron/summary']
+output_file = "roster.txt"
+# ------------------------------------------------------------------------------
 
-f = open("roster.txt", 'w')
+guilds = []
+for link in guild_links:
+    guilds.append(requests.get(link).json())
 
+    # Warmane's API doesn't like to get spammed with reqs
+    time.sleep(5)
 
-for member in g1['roster']:
-    data = []
-    data.append(member['name'])
-    data.append(member['level'])
-    data.append(member['gender'])
-    data.append(member['race'])
-    data.append(member['class'])
-    data.append(member['achievementpoints'])
-    if type(member['professions']) != type([]):
-        for p in member['professions']['professions']:
-            data.append(p['name'])
-            data.append(p['skill'])
-    else:
-        data += ["", "", "", ""]
+f = open(output_file, 'w')
 
-    data.append(g1['name'])
-    data = [str(x) for x in data]
+for guild in guilds:
+    for member in guild['roster']:
+        data = []
+        data.append(member['name'])
+        data.append(member['level'])
+        data.append(member['gender'])
+        data.append(member['race'])
+        data.append(member['class'])
+        data.append(member['achievementpoints'])
 
-    f.write('\t'.join(data))
-    f.write('\n')
+        # If there's 1 or 2 professions available
+        if type(member['professions']) != type([]):
+            for p in member['professions']['professions']:
+                data.append(p['name'])
+                data.append(p['skill'])
+            if len(member['professions']['professions']) == 1:
+                data += ["", ""]
+        # Otherwise no professions available
+        else:
+            data += ["", "", "", ""]
 
+        data.append(guild['name'])
+        data = [str(x) for x in data]
 
-for member in g2['roster']:
-    data = []
-    data.append(member['name'])
-    data.append(member['level'])
-    data.append(member['gender'])
-    data.append(member['race'])
-    data.append(member['class'])
-    data.append(member['achievementpoints'])
-    if type(member['professions']) != type([]):
-        for p in member['professions']['professions']:
-            data.append(p['name'])
-            data.append(p['skill'])
-    else:
-        data += ["", "", "", ""]
-
-    data.append(g2['name'])
-    data = [str(x) for x in data]
-
-    f.write('\t'.join(data))
-    f.write('\n')
+        f.write('\t'.join(data))
+        f.write('\n')
 
 f.close()
