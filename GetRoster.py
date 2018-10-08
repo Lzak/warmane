@@ -1,11 +1,37 @@
 import requests
 import time
+import sys
+
+
+
+class Warmane(object):
+    def __init__(self):
+        self.URL_BASE = "http://armory.warmane.com/api/"
+        self.URL_GUILD = "guild/"
+        self.OUTPUT_FILE = "roster.txt"
+
+    def getGuildURL(guild_name, realm):
+        return URL_BASE + URL_GUILD + guild_name.strip().replace(' ', '+') + '/' + realm.strip() + '/'
+        
+
+
+
 
 # ------------------------------- Config ---------------------------------------
-guild_links =   ['http://armory.warmane.com/api/guild/Ice+Crown+Citadel/Lordaeron/summary',
-                'http://armory.warmane.com/api/guild/Icecrown+Citadel+Raiders/Lordaeron/summary']
-output_file = "roster.txt"
+
+
+
+#guild_links =   [getGuildURL("Ice Crown Citadel", "Lordaeron"),
+#                getGuildURL("Icecrown Citadel Raiders", "Lordaeron")]
+
+guild_links = [getGuildURL("Global Chat Degens", "Lordaeron")]
+
+
+
 # ------------------------------------------------------------------------------
+
+
+
 
 guilds = []
 for link in guild_links:
@@ -44,3 +70,6 @@ for guild in guilds:
         f.write('\n')
 
 f.close()
+
+
+if __name__ == "__main__":
